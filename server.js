@@ -1,65 +1,52 @@
-import "dotenv/config";
-import express from "express";
-import { connectMongo } from "./src/config/db.js";
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const morgan = require('morgan');
 
-// Route modules
-import playerRoutes      from "./src/routes/players.js";
-import leaderboardRoutes from "./src/routes/leaderboard.js";
-import ingestRoutes      from "./src/routes/ingest.js";
+const { connectMongo } = require('./config/mongo');
+const { connectRedis } = require('./config/redis');
+const { startScheduler } = require('./workers/scheduler');
 
-const app  = express();
+const playersRoute = require('./routes/players');
+const leaderboardRoute = require('./routes/leaderboard');
+const adminRoute = require('./routes/admin');
+
+const app = express();
+app.use(helmet());
+app.use(cors());
+app.use(express.json());
+app.use(morgan('dev'));
+
+app.get('/api/health', (_req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+app.use('/api/players', playersRoute);
+app.use('/api/leaderboard', leaderboardRoute);
+app.use('/api/admin', adminRoute);
+
+app.use((err, _req, res, _next) => {
+  console.error('[error]', err);
+  res.status(err.status || 500).json({ error: err.message || 'Internal Server Error' });
+});
+
 const PORT = process.env.PORT || 3000;
 
-// ─── Middleware ───────────────────────────────────────────────────────────────
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+(async () => {
+  try {
+    await connectMongo();
+    await connectRedis();
 
-// Basic request logger
-app.use((req, _res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
-  next();
-});
+    if (process.env.ENABLE_SCHEDULER === 'true') {
+      startScheduler();
+    }
 
-// ─── Routes ───────────────────────────────────────────────────────────────────
-app.use("/api/players",     playerRoutes);
-app.use("/api/leaderboard", leaderboardRoutes);
-app.use("/api/ingest",      ingestRoutes);
-
-// Health check
-app.get("/", (_req, res) => {
-  res.json({
-    service:   "NBA Leaderboard & Player Stat Tracker",
-    group:     "Group E",
-    version:   "1.0.0",
-    endpoints: {
-      players:     "/api/players",
-      leaderboard: "/api/leaderboard",
-      ingest:      "/api/ingest",
-    },
-  });
-});
-
-// 404 catch-all
-app.use((_req, res) => {
-  res.status(404).json({ error: "Route not found" });
-});
-
-// Global error handler
-app.use((err, _req, res, _next) => {
-  console.error("Unhandled error:", err);
-  res.status(500).json({ error: "Internal server error" });
-});
-
-// ─── Start ────────────────────────────────────────────────────────────────────
-async function start() {
-  await connectMongo();         // connect MongoDB first
-  // Redis connects automatically via ioredis on import
-
-  app.listen(PORT, () => {
-    console.log(`\n🏀 NBA Tracker API running → http://localhost:${PORT}`);
-    console.log(`   MongoDB  : ${process.env.MONGO_URI}`);
-    console.log(`   Redis    : ${process.env.REDIS_HOST}:${process.env.REDIS_PORT}\n`);
-  });
-}
-
-start();
+    app.listen(PORT, () => {
+      console.log(`[server] listening on http://localhost:${PORT}`);
+    });
+  } catch (err) {
+    console.error('[startup] failed:', err);
+    process.exit(1);
+  }
+})();

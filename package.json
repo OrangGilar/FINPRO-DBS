@@ -19,6 +19,9 @@
   },
   "homepage": "https://github.com/OrangGilar/FINPRO-DBS#readme",
   "dependencies": {
+    "ioredis": "^5.10.1",
+    "mongodb": "^7.2.0",
+    "mongoose": "^9.6.1",
     "redis": "^5.12.1"
   }
 }
