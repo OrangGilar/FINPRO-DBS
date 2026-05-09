@@ -4,8 +4,8 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 
-const { connectMongo } = require('./config/mongo');
-const { connectRedis } = require('./config/redis');
+const { connectMongo } = require('./src/config/mongo');
+const { connectRedis } = require('./src/config/redis');
 const { startScheduler } = require('./workers/scheduler');
 
 const playersRoute = require('./routes/players');
