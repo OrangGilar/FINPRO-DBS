@@ -1,8 +1,8 @@
 const Player = require('../models/Player');
 const Game = require('../models/Game');
 const SeasonStats = require('../models/SeasonStats');
-const nbaApi = require('./nbaApi');
-const leaderboard = require('./leaderboard');
+const nbaApi = require('./NbaApi');
+const leaderboard = require('./Leaderboard');
 
 /**
  * Ingest player roster into MongoDB.
