@@ -6,7 +6,7 @@ const morgan = require('morgan');
 
 const { connectMongo } = require('./src/config/mongo');
 const { connectRedis } = require('./src/config/redis');
-const { startScheduler } = require('./workers/scheduler');
+const { startScheduler } = require('./src/workers/scheduler');
 
 const playersRoute = require('./src/routes/players');
 const leaderboardRoute = require('./src/routes/leaderboard');
