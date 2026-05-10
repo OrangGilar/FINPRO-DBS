@@ -2,14 +2,18 @@ require('dotenv').config();
 const { connectMongo } = require('../src/config/mongo');
 const { connectRedis } = require('../src/config/redis');
 const SeasonStats = require('../src/models/SeasonStats');
-const leaderboard = require('../services/leaderboard');
+const leaderboard = require('../src/service/Leaderboard');
 
 (async () => {
   try {
+    const season = Number(process.env.SEASON);
+    if (!Number.isFinite(season)) {
+      throw new Error('SEASON env var is required and must be a number');
+    }
+
     await connectMongo();
     await connectRedis();
 
-    const season = Number(process.env.SEASON);
     console.log(`[rebuild] flushing leaderboards for season ${season}`);
     await leaderboard.flushSeason(season);
 

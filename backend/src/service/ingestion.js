@@ -155,12 +155,17 @@ async function ingestGames({ season, maxPages = 3 } = {}) {
 /**
  * Full pipeline: roster → games → season stats → leaderboards.
  */
-async function runFullIngestion({ season }) {
+async function runFullIngestion({ season, playerLimit } = {}) {
   const playersResult = await ingestPlayers({ maxPages: 3 });
   const gamesResult = await ingestGames({ season, maxPages: 2 });
 
-  // Pick a sample of player IDs we just stored
-  const players = await Player.find({}, { _id: 1 }).limit(150).lean();
+  const limit = Number.isFinite(playerLimit)
+    ? playerLimit
+    : Number(process.env.FULL_INGEST_PLAYER_LIMIT) || 0;
+
+  const query = Player.find({}, { _id: 1 });
+  if (limit > 0) query.limit(limit);
+  const players = await query.lean();
   const ids = players.map((p) => p._id);
   const statsResult = await ingestSeasonAverages({ season, player_ids: ids });
 

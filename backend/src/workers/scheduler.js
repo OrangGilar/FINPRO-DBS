@@ -3,6 +3,10 @@ const ingestion = require('../service/ingestion');
 
 function startScheduler() {
   const season = Number(process.env.SEASON);
+  if (!Number.isFinite(season)) {
+    console.warn('[scheduler] SEASON env var not set or invalid — scheduler disabled');
+    return;
+  }
 
   // Every 6 hours: refresh season averages + games
   cron.schedule('0 */6 * * *', async () => {
