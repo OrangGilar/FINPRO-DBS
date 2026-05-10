@@ -8,9 +8,9 @@ const { connectMongo } = require('./src/config/mongo');
 const { connectRedis } = require('./src/config/redis');
 const { startScheduler } = require('./workers/scheduler');
 
-const playersRoute = require('./routes/players');
-const leaderboardRoute = require('./routes/leaderboard');
-const adminRoute = require('./routes/admin');
+const playersRoute = require('./src/routes/players');
+const leaderboardRoute = require('./src/routes/leaderboard');
+const adminRoute = require('./src/routes/admin');
 
 const app = express();
 app.use(helmet());
