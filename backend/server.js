@@ -14,7 +14,13 @@ const adminRoute = require('./src/routes/admin');
 
 const app = express();
 app.use(helmet());
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN
+      ? process.env.CORS_ORIGIN.split(',').map((o) => o.trim())
+      : '*'
+  })
+);
 app.use(express.json());
 app.use(morgan('dev'));
 

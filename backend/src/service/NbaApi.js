@@ -28,16 +28,8 @@ async function fetchGames({ season, cursor = 0, per_page = 100 }) {
   return data;
 }
 
-async function fetchPlayerStats({ player_id, season, per_page = 25 }) {
-  const { data } = await client.get('/stats', {
-    params: { 'player_ids[]': player_id, 'seasons[]': season, per_page }
-  });
-  return data.data;
-}
-
 module.exports = {
   fetchPlayers,
   fetchSeasonAverages,
-  fetchGames,
-  fetchPlayerStats
+  fetchGames
 };
