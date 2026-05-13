@@ -1,10 +1,12 @@
 {
-  "name": "finpro-dbs",
+  "name": "finpro-dbs-backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "NBA Leaderboard backend — Express + MongoDB + Redis",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "rebuild": "node script/rebuild.js"
   },
   "repository": {
     "type": "git",
@@ -19,15 +21,15 @@
   },
   "homepage": "https://github.com/OrangGilar/FINPRO-DBS#readme",
   "dependencies": {
-    "axios": "^1.16.0",
-    "cors": "^2.8.6",
-    "dotenv": "^17.4.2",
-    "express": "^5.2.1",
-    "helmet": "^8.1.0",
-    "ioredis": "^5.10.1",
-    "mongodb": "^7.2.0",
-    "mongoose": "^9.6.1",
-    "morgan": "^1.10.1",
-    "node-cron": "^4.2.1"
+    "axios": "^1.7.0",
+    "cors": "^2.8.5",
+    "csv-parse": "^5.5.6",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "helmet": "^8.0.0",
+    "ioredis": "^5.4.1",
+    "mongoose": "^8.7.0",
+    "morgan": "^1.10.0",
+    "node-cron": "^3.0.3"
   }
 }

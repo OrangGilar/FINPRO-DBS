@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-
-const API_BASE = '/api'
+import { api, ApiError, API_BASE } from './api'
 
 const METRICS = [
   { key: 'pts', label: 'Points' },
@@ -31,45 +30,42 @@ export default function App() {
   const [modal, setModal] = useState(null)
 
   useEffect(() => {
-    fetchLeaderboard()
-  }, [metric, season])
+    let cancelled = false
 
-  async function fetchLeaderboard() {
-    setLoading(true)
-    setError(null)
-    try {
-      // Backend route is /api/leaderboard/:metric (path param), not query param.
-      // Response shape is { metric, season, limit, items: [...] }.
-      // Each item is flat: { rank, player_id, value, first_name, last_name, position, team }
-      const res = await fetch(
-        `${API_BASE}/leaderboard/${metric}?season=${season}&limit=20`
-      )
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const json = await res.json()
-      const data = (json.items || []).map((e) => ({
-        ...e,
-        _name:
-          e.first_name || e.last_name
-            ? `${e.first_name ?? ''} ${e.last_name ?? ''}`.trim()
-            : `Player #${e.player_id}`,
-      }))
-      setRows(data)
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      setLoading(false)
+    async function load() {
+      setLoading(true)
+      setError(null)
+      try {
+        const json = await api.getLeaderboard({ metric, season, limit: 20 })
+        if (cancelled) return
+        const data = (json.items || []).map((e) => ({
+          ...e,
+          _name:
+            e.first_name || e.last_name
+              ? `${e.first_name ?? ''} ${e.last_name ?? ''}`.trim()
+              : `Player #${e.player_id}`,
+        }))
+        setRows(data)
+      } catch (err) {
+        if (cancelled) return
+        setError(
+          err instanceof ApiError
+            ? `${err.message}${err.status ? ` (HTTP ${err.status})` : ''}`
+            : String(err)
+        )
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
     }
-  }
+
+    load()
+    return () => { cancelled = true }
+  }, [metric, season])
 
   async function openModal(entry) {
     setModal({ entry, stats: null, loading: true })
     try {
-      // Backend returns the stats document directly, not wrapped in { data: [...] }.
-      const res = await fetch(
-        `${API_BASE}/players/${entry.player_id}/stats?season=${season}`
-      )
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const stats = await res.json()
+      const stats = await api.getPlayerStats({ id: entry.player_id, season })
       setModal({ entry, stats, loading: false })
     } catch {
       setModal({ entry, stats: {}, loading: false })
@@ -147,7 +143,10 @@ export default function App() {
               ) : error ? (
                 <tr>
                   <td colSpan={5} className="state-msg">
-                    {error}
+                    <div style={{ marginBottom: 4 }}>{error}</div>
+                    <div style={{ fontSize: 12, opacity: 0.7 }}>
+                      API base: <code>{API_BASE}</code>
+                    </div>
                   </td>
                 </tr>
               ) : filtered.length === 0 ? (
@@ -182,7 +181,7 @@ export default function App() {
 
       <footer className="footer">
         NBA Leaderboard — FINPRO-DBS &nbsp;|&nbsp; Data via{' '}
-        <span>basketball-reference CSV</span>
+        <span>balldontlie API</span>
       </footer>
 
       {modal && (
