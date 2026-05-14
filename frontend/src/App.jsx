@@ -13,8 +13,6 @@ const SEASONS = [
   { value: 2024, label: '2024–25' },
 ]
 
-const PAGE_SIZES = [10, 20, 50, 100]
-
 function rankColor(rank) {
   if (rank === 1) return '#fdb927'
   if (rank === 2) return '#c0c0c0'
@@ -25,7 +23,6 @@ function rankColor(rank) {
 export default function App() {
   const [metric, setMetric] = useState('pts')
   const [season, setSeason] = useState(2024)
-  const [limit, setLimit] = useState(20)
   const [search, setSearch] = useState('')
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(false)
@@ -39,7 +36,7 @@ export default function App() {
       setLoading(true)
       setError(null)
       try {
-        const json = await api.getLeaderboard({ metric, season, limit })
+        const json = await api.getLeaderboard({ metric, season, limit: 20 })
         if (cancelled) return
         const data = (json.items || []).map((e) => ({
           ...e,
@@ -63,7 +60,7 @@ export default function App() {
 
     load()
     return () => { cancelled = true }
-  }, [metric, season, limit])
+  }, [metric, season])
 
   async function openModal(entry) {
     setModal({ entry, stats: null, loading: true })
@@ -120,17 +117,6 @@ export default function App() {
             {SEASONS.map((s) => (
               <option key={s.value} value={s.value}>
                 {s.label}
-              </option>
-            ))}
-          </select>
-          <select
-            className="season-select"
-            value={limit}
-            onChange={(e) => setLimit(Number(e.target.value))}
-          >
-            {PAGE_SIZES.map((n) => (
-              <option key={n} value={n}>
-                Top {n}
               </option>
             ))}
           </select>
@@ -195,7 +181,7 @@ export default function App() {
 
       <footer className="footer">
         NBA Leaderboard — FINPRO-DBS &nbsp;|&nbsp; Data via{' '}
-        <span>NbaData.csv</span>
+        <span>balldontlie API</span>
       </footer>
 
       {modal && (

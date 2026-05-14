@@ -16,7 +16,7 @@ app.use(
   cors({
     origin: process.env.CORS_ORIGIN
       ? process.env.CORS_ORIGIN.split(',').map((o) => o.trim())
-      : '*'
+      : ['http://localhost:5173', 'http://127.0.0.1:5173']
   })
 );
 app.use(express.json());

@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_BACKEND_URL || '/api'
+const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api'
 const ADMIN_KEY = import.meta.env.VITE_ADMIN_KEY || ''
 
 class ApiError extends Error {
@@ -89,8 +89,19 @@ export const api = {
   // ---- Admin endpoints (require VITE_ADMIN_KEY) ----
 
   admin: {
-    ingestCsvStats: ({ season, filename }) =>
-      request('admin/ingest/csv-stats', { method: 'POST', body: { season, filename }, admin: true }),
+    ingestPlayers: ({ maxPages } = {}) =>
+      request('admin/ingest/players', { method: 'POST', body: { maxPages }, admin: true }),
+
+    ingestGames: ({ season, maxPages } = {}) =>
+      request('admin/ingest/games', { method: 'POST', body: { season, maxPages }, admin: true }),
+
+    ingestSeasonAverages: ({ season, player_ids }) =>
+      request('admin/ingest/season-averages', {
+        method: 'POST', body: { season, player_ids }, admin: true,
+      }),
+
+    runFullIngestion: ({ season }) =>
+      request('admin/ingest/full', { method: 'POST', body: { season }, admin: true }),
 
     flushLeaderboard: ({ season }) =>
       request('admin/leaderboard/flush', { method: 'POST', body: { season }, admin: true }),

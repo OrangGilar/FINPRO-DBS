@@ -1,11 +1,12 @@
 {
-  "name": "finpro-dbs",
+  "name": "finpro-dbs-backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "NBA Leaderboard backend — Express + MongoDB + Redis",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "node --watch server.js",
+    "rebuild": "node script/rebuild.js"
   },
   "repository": {
     "type": "git",
