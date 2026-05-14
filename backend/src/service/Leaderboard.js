@@ -23,7 +23,7 @@ async function getTop({ metric, season, limit = 10 }) {
   if (!METRICS.includes(metric)) throw new Error(`Invalid metric: ${metric}`);
   const redis = getRedis();
   // ZRANGE REV WITHSCORES → [id1, score1, id2, score2, ...]
-  const flat = await redis.zrange(key(metric, season), 0, limit - 1, 'REV', 'WITHSCORES');
+  const flat = await redis.zrevrange(key(metric, season), 0, limit - 1, 'WITHSCORES');
   const result = [];
   for (let i = 0; i < flat.length; i += 2) {
     result.push({

@@ -6,8 +6,6 @@ const morgan = require('morgan');
 
 const { connectMongo } = require('./src/config/mongo');
 const { connectRedis } = require('./src/config/redis');
-const { startScheduler } = require('./src/workers/scheduler');
-
 const playersRoute = require('./src/routes/players');
 const leaderboardRoute = require('./src/routes/leaderboard');
 const adminRoute = require('./src/routes/admin');
@@ -43,10 +41,6 @@ const PORT = process.env.PORT || 3000;
   try {
     await connectMongo();
     await connectRedis();
-
-    if (process.env.ENABLE_SCHEDULER === 'true') {
-      startScheduler();
-    }
 
     app.listen(PORT, () => {
       console.log(`[server] listening on http://localhost:${PORT}`);

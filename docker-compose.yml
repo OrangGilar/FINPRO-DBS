@@ -1,0 +1,46 @@
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - "27017:27017"
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      - mongo
+      - redis
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      MONGO_URI: mongodb://mongo:27017/finpro
+      REDIS_URL: redis://redis:6379
+      ADMIN_KEY: ${ADMIN_KEY:-FINPRO}
+      CORS_ORIGIN: http://localhost:5173
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "5173:5173"
+    environment:
+      BACKEND_URL: http://backend:3000
+      VITE_PORT: 5173
+
+volumes:
+  mongo_data:
+  redis_data:

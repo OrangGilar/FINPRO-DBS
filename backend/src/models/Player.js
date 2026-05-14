@@ -14,18 +14,10 @@ const TeamSchema = new mongoose.Schema(
 
 const PlayerSchema = new mongoose.Schema(
   {
-    _id: { type: Number, required: true }, // balldontlie player ID
+    _id: { type: Number, required: true },
     first_name: String,
     last_name: String,
     position: String,
-    height: String,
-    weight: String,
-    jersey_number: String,
-    college: String,
-    country: String,
-    draft_year: Number,
-    draft_round: Number,
-    draft_number: Number,
     team: TeamSchema,
     updated_at: { type: Date, default: Date.now }
   },
