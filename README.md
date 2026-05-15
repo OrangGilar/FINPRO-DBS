@@ -60,36 +60,7 @@ We treat **MongoDB as the source of truth** and **Redis as a derived projection*
 
 ---
 
-## Project structure
 
-​```
-.
-├── backend/
-│   ├── data/NbaData.csv          # 2024–25 stats (committed)
-│   ├── src/
-│   │   ├── config/{mongo,redis}.js
-│   │   ├── middleware/requireAdminKey.js
-│   │   ├── models/{Player,SeasonStats,Game}.js
-│   │   ├── routes/{leaderboard,players,admin}.js
-│   │   └── service/{Leaderboard,csvIngestion}.js
-│   ├── server.js
-│   ├── Dockerfile
-│   └── package.json
-├── frontend/
-│   ├── src/
-│   │   ├── App.jsx               # tabs, table, modal, search
-│   │   ├── api.js                # centralized client w/ X-Admin-Key handling
-│   │   ├── main.jsx              # React mount
-│   │   └── index.css
-│   ├── index.html
-│   ├── vite.config.js            # dev proxy → backend
-│   ├── Dockerfile
-│   └── package.json
-├── docker-compose.yml            # the easy way to run everything
-└── README.md                     # this file
-​```
-
----
 
 ## Quick start (Docker — recommended)
 
@@ -296,5 +267,4 @@ string from Atlas instead of the `mongodb+srv://` one.
 - **Basketball Reference** for the per-game stats CSV (2024–25 season).
 - **AI tooling disclosure** — Claude (Anthropic) was used to help draft
   documentation, debug ingestion edge cases (BOM, delimiter detection),
-  and review code. All code was read, tested, and verified by us; we can
-  explain any part of the project during Q&A.
+  and review code. All code was read, tested, and verified by us.
